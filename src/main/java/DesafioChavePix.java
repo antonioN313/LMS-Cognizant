@@ -13,30 +13,30 @@ public class DesafioChavePix {
         String valor = args[1];
         String instituicao = args[2];
 
-        servicoChavePix service = new servicoChavePix();
+        ServicoChavePix service = new ServicoChavePix();
         service.cadastrar(tipo, valor, instituicao);
 
 
     }
 }
 
-record chavePix (String tipo, String valor, String instituicao){
+record ChavePix (String tipo, String valor, String instituicao){
     @Override
     public String toString() {
         return tipo + ";" + valor + ";" + instituicao;
     }
 
-    static chavePix fromString(String linha) {
+    static ChavePix fromString(String linha) {
         String[] argumentos = linha.split(";");
-        return new chavePix (argumentos[0], argumentos[1], argumentos[2]);
+        return new ChavePix (argumentos[0], argumentos[1], argumentos[2]);
     }
 }
 
-interface validarChavePix {
+interface ValidarChavePix {
     boolean validar(String valor);
 }
 
-class validarCPF implements validarChavePix {
+class ValidarCPF implements ValidarChavePix {
     @Override
     public boolean validar(String valor){
         if (!valor.matches("/[0-9]{3}\\.[\\d*]{3}\\.-?[0-9]{2}/")) return false;
@@ -62,7 +62,7 @@ class validarCPF implements validarChavePix {
     }
 }
 
-class validarCNPJ implements validarChavePix {
+class ValidarCNPJ implements ValidarChavePix {
     @Override
     public boolean validar(String valor){
         if (!valor.matches("^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$")) return false;
@@ -88,35 +88,35 @@ class validarCNPJ implements validarChavePix {
     }
 }
 
-class validarTelefone implements validarChavePix{
+class validarTelefone implements ValidarChavePix{
     @Override
     public boolean validar(String valor) {
         return valor.matches("^\\+(?:[0-9] ?){6,14}[0-9]$");
     }
 }
 
-class validarEmail implements validarChavePix{
+class ValidarEmail implements ValidarChavePix{
     public boolean validar(String valor) {
         return valor.matches("^[\\w!#$%&’*+/=?`{|}~^.-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^.-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
     }
 }
 
-class repositorioChavePix {
+class RepositorioChavePix {
     private static final Path FILE_PATH = Paths.get(".chaves");
 
-    public List<chavePix> carregar() {
+    public List<ChavePix> carregar() {
         if (!Files.exists(FILE_PATH)) return new ArrayList<>();
         try {
             return Files.readAllLines(FILE_PATH)
                     .stream()
-                    .map(chavePix::fromString)
+                    .map(ChavePix::fromString)
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException("Erro ao carregar chaves", e);
         }
     }
 
-    public void salvar(chavePix key) {
+    public void salvar(ChavePix key) {
         try (BufferedWriter writer = Files.newBufferedWriter(FILE_PATH,
                 StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
             writer.write(key.toString());
@@ -127,14 +127,14 @@ class repositorioChavePix {
     }
 }
 
-class servicoChavePix {
-    private final repositorioChavePix repo = new repositorioChavePix();
+class ServicoChavePix {
+    private final RepositorioChavePix repo = new RepositorioChavePix();
 
-    private final Map<String, validarChavePix> validadores = Map.of(
-            "CPF", new validarCPF(),
-            "CNPJ", new validarCNPJ(),
+    private final Map<String, ValidarChavePix> validadores = Map.of(
+            "CPF", new ValidarCPF(),
+            "CNPJ", new ValidarCNPJ(),
             "TELEFONE", new validarTelefone(),
-            "EMAIL", new validarEmail()
+            "EMAIL", new ValidarEmail()
     );
 
     public void cadastrar(String tipo, String valor, String instituicao){
@@ -143,21 +143,21 @@ class servicoChavePix {
             System.out.println("Tipo de chave inválido.");
             return;
         }
-        validarChavePix validador = validadores.get(tipo);
+        ValidarChavePix validador = validadores.get(tipo);
         if (!validador.validar(valor)) {
             System.out.println("Chave inválida.");
             return;
         }
 
-        List<chavePix> existentes = repo.carregar();
-        for (chavePix k : existentes) {
+        List<ChavePix> existentes = repo.carregar();
+        for (ChavePix k : existentes) {
             if (k.valor().equals(valor)) {
                 System.out.printf("Chave já existe na instituição: %s%n", k.instituicao());
                 return;
             }
         }
 
-        chavePix nova = new chavePix(tipo, valor, instituicao);
+        ChavePix nova = new ChavePix(tipo, valor, instituicao);
         repo.salvar(nova);
         System.out.println("Chave cadastrada com sucesso!");
     }

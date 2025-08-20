@@ -8,7 +8,7 @@ import java.util.Base64;
 public class DesafioSenhaGerenciar {
 
   private static final String FILE_NAME = ".passwords";
-  private static final int PASSWORD_LENGHT_MAX = 16;
+  private static final int PASSWORD_LENGTH_MAX = 16;
   private static final SecureRandom random = new SecureRandom();
 
   public static void main(String[] args) {
@@ -50,7 +50,7 @@ public class DesafioSenhaGerenciar {
       default:
 
         String redeSocial = args[0];
-        int length = PASSWORD_LENGHT_MAX;
+        int length = PASSWORD_LENGTH_MAX;
 
         if (args.length == 3 && args[1].equals("--length")) {
 
@@ -58,7 +58,7 @@ public class DesafioSenhaGerenciar {
             length = Integer.parseInt(args[2]);
           } catch (NumberFormatException e) {
 
-            System.out.println("Tamanho Invalido, usando padrao (" + PASSWORD_LENGHT_MAX + ")");
+            System.out.println("Tamanho Invalido, usando padrao (" + PASSWORD_LENGTH_MAX + ")");
             
           }
           
@@ -125,7 +125,7 @@ public class DesafioSenhaGerenciar {
 
   private static void atualizarSenha(Path filePath, Map<String, String> senhas, String rede) {
     if (senhas.containsKey(rede)) {
-      String senha = gerarSenhaForte(DesafioSenhaGerenciar.PASSWORD_LENGHT_MAX);
+      String senha = gerarSenhaForte(DesafioSenhaGerenciar.PASSWORD_LENGTH_MAX);
       senhas.put(rede, senha);
       salvarSenhas(filePath, senhas);
       System.out.println("Senha atualizada para "+ rede + ": "+ senha);
