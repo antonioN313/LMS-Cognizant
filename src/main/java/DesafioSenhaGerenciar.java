@@ -2,11 +2,10 @@ import java.io.*;
 import java.nio.file.*;
 import java.security.SecureRandom;
 import java.util.*;
-import java.crypto.Cipher;
-import java.crypto.spec.SecretKeySpec;
+
 import java.util.Base64;
 
-public class SenhaGerenciar {
+public class DesafioSenhaGerenciar {
 
   private static final String FILE_NAME = ".passwords";
   private static final int PASSWORD_LENGHT_MAX = 16;
@@ -32,7 +31,7 @@ public class SenhaGerenciar {
           return;
         }
 
-        atualizarSenha(filePath, senhas, args[1], PASSWORD_LENGHT_MAX);
+        atualizarSenha(filePath, senhas, args[1]);
         break;
 
       case "--delete":
@@ -104,7 +103,7 @@ public class SenhaGerenciar {
     try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
       for (Map.Entry <String, String> entry : senhas.entrySet()) {
         writer.write(entry.getKey() + ":" + entry.getValue());
-        writer.newLine()
+        writer.newLine();
       }
     } catch (IOException e) {
       System.out.println("Erro ao salvar senhas: " + e.getMessage());
@@ -124,9 +123,9 @@ public class SenhaGerenciar {
     }
   }
 
-  private static void atualizarSenha(Path filePath, Map<String, String> senhas, String rede, int length) {
+  private static void atualizarSenha(Path filePath, Map<String, String> senhas, String rede) {
     if (senhas.containsKey(rede)) {
-      String senha = gerarSenhaForte(length);
+      String senha = gerarSenhaForte(DesafioSenhaGerenciar.PASSWORD_LENGHT_MAX);
       senhas.put(rede, senha);
       salvarSenhas(filePath, senhas);
       System.out.println("Senha atualizada para "+ rede + ": "+ senha);
